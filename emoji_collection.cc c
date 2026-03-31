@@ -1,0 +1,47 @@
+#include "emoji_collection.h"
+
+#include <esp_log.h>
+#include <unordered_map>
+#include <string>
+
+#define TAG "EmojiCollection"
+
+void EmojiCollection::AddEmoji(const std::string& name, LvglImage* image) {
+    emoji_collection_[name] = image;
+}
+
+const LvglImage* EmojiCollection::GetEmojiImage(const char* name) {
+    auto it = emoji_collection_.find(name);
+    if (it != emoji_collection_.end()) {
+        return it->second;
+    }
+
+    ESP_LOGW(TAG, "Emoji not found: %s", name);
+    return nullptr;
+}
+
+EmojiCollection::~EmojiCollection() {
+    for (auto it = emoji_collection_.begin(); it != emoji_collection_.end(); ++it) {
+        delete it->second;
+    }
+    emoji_collection_.clear();
+}
+
+// ✅ ONLY USE 32px EMOJIS (FIX)
+extern const lv_image_dsc_t emoji_1f636_32;
+extern const lv_image_dsc_t emoji_1f642_32;
+extern const lv_image_dsc_t emoji_1f606_32;
+extern const lv_image_dsc_t emoji_1f602_32;
+extern const lv_image_dsc_t emoji_1f614_32;
+extern const lv_image_dsc_t emoji_1f620_32;
+extern const lv_image_dsc_t emoji_1f62d_32;
+
+Twemoji32::Twemoji32() {
+    AddEmoji("neutral", new LvglSourceImage(&emoji_1f636_32));
+    AddEmoji("happy", new LvglSourceImage(&emoji_1f642_32));
+    AddEmoji("laughing", new LvglSourceImage(&emoji_1f606_32));
+    AddEmoji("funny", new LvglSourceImage(&emoji_1f602_32));
+    AddEmoji("sad", new LvglSourceImage(&emoji_1f614_32));
+    AddEmoji("angry", new LvglSourceImage(&emoji_1f620_32));
+    AddEmoji("crying", new LvglSourceImage(&emoji_1f62d_32));
+}
